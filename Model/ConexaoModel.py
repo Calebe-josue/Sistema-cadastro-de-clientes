@@ -4,13 +4,16 @@ import os
 
 class ConexaoBanco:
     def __init__(self):
-        db_path = os.path.join(os.path.dirname(__file__), "banco.db")
-        self.conexao = sqlite3.connect(db_path)
-        self.cursor = self.conexao.cursor()
+        self.db_path = os.path.join(os.path.dirname(__file__), "banco.db")
 
+    def _conectar(self):
+        conexao = sqlite3.connect(self.db_path)
+        cursor = conexao.cursor()
+        return conexao, cursor
 
     def CriarTabelaUsuario(self) -> None:
-        self.cursor.execute("""
+        conexao, cursor = self._conectar()
+        cursor.execute("""
             CREATE TABLE IF NOT EXISTS login (
             id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
             nome TEXT NOT NULL,
@@ -18,32 +21,57 @@ class ConexaoBanco:
             )""")
         
         # verifica se já existe
-        self.cursor.execute("SELECT * FROM login WHERE nome = ? AND senha = ?", ("Calebe", "1234"))
-        if not self.cursor.fetchone():
-            self.cursor.execute(
-            """INSERT INTO login (nome, senha) VALUES
-            ("Calebe", "1234")"""
-        )
+        cursor.execute("SELECT * FROM login WHERE nome = ? AND senha = ?", ("Calebe", "1234"))
+        if not cursor.fetchone():
+            cursor.execute(
+                "INSERT INTO login (nome, senha) VALUES (?, ?)",
+                ("Calebe", "1234")
+            )
 
-        self.conexao.commit()
+        conexao.commit()
+        conexao.close()
 
     
-    def TabelaUsuario(self) -> tuple:
+    def TabelaUsuario(self) -> list:
         self.CriarTabelaUsuario()
-        self.cursor.execute("SELECT * FROM login")
-        dados = self.cursor.fetchall()
+        conexao, cursor = self._conectar()
+        cursor.execute("SELECT * FROM login")
+        dados = cursor.fetchall()
+        conexao.close()
         return dados
 
-
-
-    def CriarTabelaClientes(self) -> None:
-        
     
+    def CriarTabelaClientes(self) -> None:
+        conexao, cursor = self._conectar()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS clientes (
+            id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+            email TEXT NOT NULL,
+            telefone TEXT NOT NULL 
+            )""")       
+        conexao.commit()
+        conexao.close()
       
 
+    def cadastrar_cliente(self, nome, email, telefone) -> str:
+        self.CriarTabelaClientes()
+        conexao, cursor = self._conectar()
+        cursor.execute("""
+        INSERT INTO clientes (nome, email, telefone)
+        VALUES (?, ?, ?)
+        """, (nome, email, telefone))
+
+        conexao.commit()
+        conexao.close()
+        return "Cliente cadastrado com sucesso!"
 
 
-# cursor.execute("""DELETE FROM login
-#                 WHERE id = 2""")
+    def TabelaClientes(self) -> list:
+        self.CriarTabelaClientes()
+        conexao, cursor = self._conectar()
+        cursor.execute("SELECT * FROM clientes")
+        dados = cursor.fetchall()
+        conexao.close()
+        return dados
 
-# conexao.commit()
