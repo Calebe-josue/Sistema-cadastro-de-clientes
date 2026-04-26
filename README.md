@@ -105,7 +105,7 @@ Após o login, você poderá:
 
 ## Autor
 
-Desenvolvido por [Calebe](https://github.com/seu-usuario)
+Desenvolvido por [Calebe](https://github.com/Calebe-josue)
 
 Sinta-se à vontade para contribuir, reportar issues ou sugerir melhorias!
 
