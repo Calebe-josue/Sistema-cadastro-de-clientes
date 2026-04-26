@@ -1,6 +1,6 @@
-from View import Janela
+from View import JanelaView
 
-login = Janela.Janela("Minha Janela", 300, 300)
+login = JanelaView.Janela("Minha Janela", 300, 300)
 
-login.exibir()
+login.exibir_login()
 

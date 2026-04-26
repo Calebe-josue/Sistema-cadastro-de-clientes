@@ -1,26 +1,49 @@
 import sqlite3
+import os
 
 
-class ConexaoModel:
+class ConexaoBanco:
     def __init__(self):
-        self.conexao = sqlite3.connect("Sistema de cadastro de cliente/Model/banco.db")
+        db_path = os.path.join(os.path.dirname(__file__), "banco.db")
+        self.conexao = sqlite3.connect(db_path)
         self.cursor = self.conexao.cursor()
 
-    
-conexao = sqlite3.connect("Sistema de cadastro de cliente/Model/banco.db")
-cursor = conexao.cursor()
 
-cursor.execute("""CREATE TABLE IF NOT EXISTS login (
+    def CriarTabelaUsuario(self) -> None:
+        self.cursor.execute("""
+            CREATE TABLE IF NOT EXISTS login (
             id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
             nome TEXT NOT NULL,
             senha TEXT NOT NULL
             )""")
+        
+        # verifica se já existe
+        self.cursor.execute("SELECT * FROM login WHERE nome = ? AND senha = ?", ("Calebe", "1234"))
+        if not self.cursor.fetchone():
+            self.cursor.execute(
+            """INSERT INTO login (nome, senha) VALUES
+            ("Calebe", "1234")"""
+        )
 
-#cursor.execute("""INSERT INTO login 
-#                (nome,senha) VALUES
-#                ("Pedro","1234")""")
+        self.conexao.commit()
 
-cursor.execute("""DELETE FROM login
-                WHERE id = 2""")
+    
+    def TabelaUsuario(self) -> tuple:
+        self.CriarTabelaUsuario()
+        self.cursor.execute("SELECT * FROM login")
+        dados = self.cursor.fetchall()
+        return dados
 
-conexao.commit()
+
+
+    def CriarTabelaClientes(self) -> None:
+        
+    
+      
+
+
+
+# cursor.execute("""DELETE FROM login
+#                 WHERE id = 2""")
+
+# conexao.commit()
